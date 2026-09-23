@@ -26,9 +26,7 @@ export function createInitialState(pairCount: number): GameState {
 export type GameAction =
     | { type: 'SELECT_CARD'; cardId: number }
     | { type: 'RESOLVE_MATCH'; firstCardId: number; secondCardId: number }//iki kartı karşılaştırıp sonucu uygulama
-    | { type: 'CLEAR_SELECTED_CARDS' }//seçimleri temizleme
     | { type: 'TICK_COUNTDOWN' }// geri sayımı azaltma
-    | { type: 'START_GAME' }
     | { type: 'TICK_TIMER' }
     | { type: 'RESTART_GAME'; pairCount: number }
 
@@ -53,7 +51,6 @@ export function gameReducer(
                     gameStarted: true,
                 }
             }
-
             // Geri sayım devam ediyorsa değeri bir azaltır.
             return {
                 ...state,
@@ -61,6 +58,17 @@ export function gameReducer(
             }
 
         case 'SELECT_CARD': {
+            const card = state.cards.find((currentCard) => currentCard.id === action.cardId)
+
+            if (!state.gameStarted
+                || state.selectedCardIds.length >= 2
+                || !card
+                || card.isMatched
+                || card.isFlipped
+            ) {
+                return state
+            }
+
             // Daha önce seçilen kartların yanına yeni kartın ID'sini ekler.
             const selectedCardIds = [...state.selectedCardIds, action.cardId]
 
@@ -91,14 +99,27 @@ export function gameReducer(
                 (card) => card.id === action.secondCardId,
             )
 
-            // Kartlardan biri bulunamazsa mevcut state'i değiştirmez.
-            if (!firstCard || !secondCard) return state
+            const hasSelectedCards =
+                state.selectedCardIds.length === 2 &&
+                state.selectedCardIds.includes(action.firstCardId) &&
+                state.selectedCardIds.includes(action.secondCardId)
+
+            // Yalnızca o anda seçili olan iki farklı kart çözülebilir.
+            if (
+                !hasSelectedCards ||
+                action.firstCardId === action.secondCardId ||
+                !firstCard ||
+                !secondCard
+            ) {
+                return state
+            }
 
             // Aynı pairId'ye sahip kartlar birbirinin eşidir.
             const isMatch = firstCard.pairId === secondCard.pairId
 
             return {
                 ...state,
+                selectedCardIds: [],
                 // Eşleşen kartları açık ve eşleşmiş bırakır.
                 // Eşleşmeyen kartları tekrar kapatır.
                 cards: state.cards.map((card) => {
@@ -116,21 +137,6 @@ export function gameReducer(
                 }),
             }
         }
-
-        case 'CLEAR_SELECTED_CARDS':
-            // Eşleşme kontrolü tamamlandıktan sonra geçici seçimleri temizler.
-            // Kartların kendisine dokunmaz; eşleşen kartlar açık kalır.
-            return {
-                ...state,
-                selectedCardIds: [],
-            }
-
-        case 'START_GAME':
-            // Geri sayım tamamlandığında kartların tıklanabilmesini sağlar.
-            return {
-                ...state,
-                gameStarted: true,
-            }
 
         case 'RESTART_GAME':
             // Yeni bir deste ve başlangıç değerleri oluşturur.

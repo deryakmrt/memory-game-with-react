@@ -57,19 +57,12 @@ function useMemoryGame(pairCount: number) {
                 firstCardId,
                 secondCardId,
             })
-            dispatch({ type: 'CLEAR_SELECTED_CARDS' })
         }, isMatch ? 350 : 800)
 
         return () => window.clearTimeout(timer)
     }, [state.cards, state.selectedCardIds])
 
     function handleCardClick(cardId: number) {
-        if (!state.gameStarted || isChecking) return
-
-        const card = state.cards.find((currentCard) => currentCard.id === cardId)
-
-        if (!card || card.isMatched || card.isFlipped) return
-
         dispatch({ type: 'SELECT_CARD', cardId })
     }
 
