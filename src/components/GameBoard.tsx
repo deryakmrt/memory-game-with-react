@@ -1,29 +1,21 @@
-import type { CardType } from '../types/game'
-import Card from './Card'
+import Card from "./Card";
+import { useGame } from "../context/useGame";
 
-type GameBoardProps = {
-  cards: CardType[]
-  columns: number
-  countdown: number | null
-  gameStarted: boolean
-  isPaused: boolean
-  isChecking: boolean
-  onCardClick: (cardId: number) => void
-}
+type GameBoardProps = { columns: number };
 
-function GameBoard({
-  cards,
-  columns,
-  countdown,
-  gameStarted,
-  isPaused,
-  isChecking,
-  onCardClick,
-}: GameBoardProps) {
+function GameBoard({ columns }: GameBoardProps) {
+  const {
+    cards,
+    countdown,
+    gameStarted,
+    isPaused,
+    isChecking,
+    handleCardClick,
+  } = useGame();
   return (
     <section className="board">
       <div
-        className="board-grid"
+        className={`board-grid ${countdown !== null || isPaused ? "board-grid--blurred" : ""}`}
         style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
       >
         {cards.map((card) => (
@@ -32,7 +24,7 @@ function GameBoard({
             card={card}
             isPaused={isPaused}
             disabled={!gameStarted || isPaused || isChecking}
-            onClick={() => onCardClick(card.id)}
+            onClick={() => handleCardClick(card.id)}
           />
         ))}
       </div>
@@ -47,7 +39,7 @@ function GameBoard({
         </div>
       )}
     </section>
-  )
+  );
 }
 
-export default GameBoard
+export default GameBoard;

@@ -1,24 +1,14 @@
 import formatTime from "../utils/formatTime";
+import { useGame } from "../context/useGame";
 
 type GameHeaderProps = {
   label: string;
-  moves: number;
-  elapsedTime: number;
-  isPaused: boolean;
   onBackToHome: () => void;
-  onTogglePause: () => void;
-  onRestart: () => void;
 };
 
-function GameHeader({
-  label,
-  moves,
-  elapsedTime,
-  isPaused,
-  onBackToHome,
-  onTogglePause,
-  onRestart,
-}: GameHeaderProps) {
+function GameHeader({label, onBackToHome}: GameHeaderProps) {
+// Verileri ve aksiyonları direkt Context telsizinden alıyoruz
+const {moves, elapsedTime, isPaused, togglePause, restartGame} = useGame();
   return (
     <header className="game-header">
       <div>
@@ -30,10 +20,10 @@ function GameHeader({
         <span>⏱️ Süre: {formatTime(elapsedTime)}</span>
       </div>
       <div className="game-actions">
-        <button className="text-button" type="button" onClick={onTogglePause}>
+        <button className="text-button" type="button" onClick={togglePause}>
           {isPaused ? '▶️' : '⏸️'}
         </button>
-        <button className="text-button" type="button" onClick={onRestart}>
+        <button className="text-button" type="button" onClick={restartGame}>
           Yeniden başlat
         </button>
         <button className="text-button" type="button" onClick={onBackToHome}>
