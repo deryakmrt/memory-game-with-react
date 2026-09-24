@@ -1,6 +1,10 @@
-import { type ReactNode } from 'react'
+import { createContext, type ReactNode } from 'react'
 import useMemoryGame from '../hooks/useMemoryGame'
-import { GameContext } from './contextValue'
+
+//useMemoryGame hook'unun döndürdüğü tüm veri ve fonksiyon tiplerini otomatik alıyo
+export type GameContextValue = ReturnType<typeof useMemoryGame>
+//context kanalını burada oluşturuyoruz (artık contextValue.ts ye gerek kalmadı)
+export const GameContext = createContext<GameContextValue | null>(null)
 
 interface GameProviderProps {
   pairCount: number
