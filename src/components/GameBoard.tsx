@@ -6,6 +6,7 @@ type GameBoardProps = {
   columns: number
   countdown: number | null
   gameStarted: boolean
+  isPaused: boolean
   isChecking: boolean
   onCardClick: (cardId: number) => void
 }
@@ -15,6 +16,7 @@ function GameBoard({
   columns,
   countdown,
   gameStarted,
+  isPaused,
   isChecking,
   onCardClick,
 }: GameBoardProps) {
@@ -28,7 +30,8 @@ function GameBoard({
           <Card
             key={card.id}
             card={card}
-            disabled={!gameStarted || isChecking}
+            isPaused={isPaused}
+            disabled={!gameStarted || isPaused || isChecking}
             onClick={() => onCardClick(card.id)}
           />
         ))}
@@ -36,6 +39,11 @@ function GameBoard({
       {countdown !== null && (
         <div className="countdown-overlay" aria-live="polite">
           <span>{countdown}</span>
+        </div>
+      )}
+      {isPaused && (
+        <div className="pause-overlay" aria-live="polite">
+          <span>Oyun duraklatıldı</span>
         </div>
       )}
     </section>

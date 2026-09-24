@@ -4,14 +4,20 @@ type GameHeaderProps = {
   label: string;
   moves: number;
   elapsedTime: number;
+  isPaused: boolean;
   onBackToHome: () => void;
+  onTogglePause: () => void;
+  onRestart: () => void;
 };
 
 function GameHeader({
   label,
   moves,
   elapsedTime,
+  isPaused,
   onBackToHome,
+  onTogglePause,
+  onRestart,
 }: GameHeaderProps) {
   return (
     <header className="game-header">
@@ -23,9 +29,17 @@ function GameHeader({
         <span>🕹️ Hamle: {moves}</span>
         <span>⏱️ Süre: {formatTime(elapsedTime)}</span>
       </div>
-      <button className="text-button" type="button" onClick={onBackToHome}>
-        Ana sayfa
-      </button>
+      <div className="game-actions">
+        <button className="text-button" type="button" onClick={onTogglePause}>
+          {isPaused ? '▶️' : '⏸️'}
+        </button>
+        <button className="text-button" type="button" onClick={onRestart}>
+          Yeniden başlat
+        </button>
+        <button className="text-button" type="button" onClick={onBackToHome}>
+          Ana sayfa
+        </button>
+      </div>
     </header>
   );
 }

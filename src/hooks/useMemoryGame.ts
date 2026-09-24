@@ -31,18 +31,18 @@ function useMemoryGame(pairCount: number) {
 
     useEffect(() => {
         // Oyun başlamadıysa veya bittiyse süre çalışmaz.
-        if (!state.gameStarted || isFinished) return
+        if (!state.gameStarted || state.isPaused || isFinished) return
 
         const timer = window.setInterval(() => {
             dispatch({ type: 'TICK_TIMER' })
         }, 1000)
 
         return () => window.clearInterval(timer)
-    }, [state.gameStarted, isFinished])
+    }, [state.gameStarted, state.isPaused, isFinished])
 
     useEffect(() => {
         // İki kart seçilmeden eşleşme kontrolü yapılmaz.
-        if (state.selectedCardIds.length !== 2) return
+        if (state.selectedCardIds.length !== 2 || state.isPaused) return
 
         const [firstCardId, secondCardId] = state.selectedCardIds
 
@@ -60,7 +60,7 @@ function useMemoryGame(pairCount: number) {
         }, isMatch ? 350 : 800)
 
         return () => window.clearTimeout(timer)
-    }, [state.cards, state.selectedCardIds])
+    }, [state.cards, state.selectedCardIds, state.isPaused])
 
     function handleCardClick(cardId: number) {
         dispatch({ type: 'SELECT_CARD', cardId })
@@ -76,9 +76,11 @@ function useMemoryGame(pairCount: number) {
         moves: state.moves,
         countdown: state.countdown,
         gameStarted: state.gameStarted,
+        isPaused: state.isPaused,
         elapsedTime: state.elapsedTime,
         isChecking,
         isFinished,
+        togglePause: () => dispatch({ type: 'TOGGLE_PAUSE' }),
         handleCardClick,
         restartGame,
     }

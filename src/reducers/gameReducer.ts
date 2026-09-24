@@ -7,6 +7,7 @@ export interface GameState {
     moves: number
     countdown: number | null
     gameStarted: boolean
+    isPaused: boolean
     elapsedTime: number
     gameRound: number
 }
@@ -18,6 +19,7 @@ export function createInitialState(pairCount: number): GameState {
         moves: 0,
         countdown: 3,
         gameStarted: false,
+        isPaused: false,
         elapsedTime: 0,
         gameRound: 0,
     }
@@ -28,6 +30,7 @@ export type GameAction =
     | { type: 'RESOLVE_MATCH'; firstCardId: number; secondCardId: number }//iki kartı karşılaştırıp sonucu uygulama
     | { type: 'TICK_COUNTDOWN' }// geri sayımı azaltma
     | { type: 'TICK_TIMER' }
+    | { type: 'TOGGLE_PAUSE' }
     | { type: 'RESTART_GAME'; pairCount: number }
 
 export function gameReducer(
@@ -37,6 +40,8 @@ export function gameReducer(
     switch (action.type) {
         case 'TICK_TIMER':
             // Oyun devam ederken geçen süreyi bir saniye artırır.
+            if (!state.gameStarted || state.isPaused) return state
+
             return {
                 ...state,
                 elapsedTime: state.elapsedTime + 1,
@@ -49,6 +54,7 @@ export function gameReducer(
                     ...state,
                     countdown: null,
                     gameStarted: true,
+                    isPaused: false,
                 }
             }
             // Geri sayım devam ediyorsa değeri bir azaltır.
@@ -61,6 +67,7 @@ export function gameReducer(
             const card = state.cards.find((currentCard) => currentCard.id === action.cardId)
 
             if (!state.gameStarted
+                || state.isPaused
                 || state.selectedCardIds.length >= 2
                 || !card
                 || card.isMatched
@@ -137,6 +144,14 @@ export function gameReducer(
                 }),
             }
         }
+
+        case 'TOGGLE_PAUSE':
+            if (!state.gameStarted) return state
+
+            return {
+                ...state,
+                isPaused: !state.isPaused,
+            }
 
         case 'RESTART_GAME':
             // Yeni bir deste ve başlangıç değerleri oluşturur.

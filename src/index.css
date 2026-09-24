@@ -94,6 +94,9 @@ h1, h2, p { margin-top: 0; }
 .result-panel .text-button:hover { background: #153b3d; }
 .primary-button { background: #c46b45; color: #fffdf8; }
 .primary-button:hover { background: #aa5737; }
+.board-grid--blurred { filter: blur(4px); pointer-events: none; }
+.pause-overlay { position: absolute; inset: 0.9rem; z-index: 5; display: grid; place-items: center; border-radius: 0.9rem; background: rgba(23, 32, 51, 0.4); backdrop-filter: blur(4px); }
+.pause-overlay span { color: #fffdf8; font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 700; padding: 0.8rem 1.5rem; background: rgba(29, 77, 79, 0.85); border-radius: 0.8rem; box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2); }
 
 @media (max-width: 760px) {
 	.game-page { padding: 1rem; }

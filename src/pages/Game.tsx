@@ -45,13 +45,17 @@ function GameContent({ settings }: GameContentProps) {
         label={settings.label}
         moves={game.moves}
         elapsedTime={game.elapsedTime}
+        isPaused={game.isPaused}
         onBackToHome={() => navigate('/')}
+        onTogglePause={game.togglePause}
+        onRestart={game.restartGame}
       />
       <GameBoard
         cards={game.cards}
         columns={settings.columns}
         countdown={game.countdown}
         gameStarted={game.gameStarted}
+        isPaused={game.isPaused}
         isChecking={game.isChecking}
         onCardClick={game.handleCardClick}
       />

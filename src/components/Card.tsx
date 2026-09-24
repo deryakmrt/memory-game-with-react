@@ -4,10 +4,11 @@ interface CardProps{
 	card: CardType
 	onClick: () => void
 	disabled: boolean 
+	isPaused?: boolean
 }
 
-function Card({card,onClick,disabled}: CardProps){
-	const isVisible = card.isFlipped || card.isMatched //kart çevrilmişse veya eşleşmişse görünsün
+function Card({card,onClick,disabled,isPaused=false}: CardProps){
+	const isVisible = card.isFlipped && !isPaused || card.isMatched //kart çevrilmişse veya eşleşmişse görünsün
 	return(
 		<button
 		type="button"
