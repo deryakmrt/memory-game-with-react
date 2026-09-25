@@ -1,16 +1,22 @@
-import { useEffect, useReducer } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import {
     createInitialState,
     gameReducer,
 } from '../reducers/gameReducer'
+import type { Difficulty } from '../types/game'
+import { loadHighScores, saveHighScore, type HighScores } from '../utils/highScores'
 
-function useMemoryGame(pairCount: number) {
+function useMemoryGame(pairCount: number, difficulty: Difficulty) {
     // Oyunun bütün state'leri reducer üzerinden yönetilir.
     const [state, dispatch] = useReducer(
         gameReducer,
         pairCount,
         createInitialState,
     )
+
+    // rekorlar localStorage'dan bir kere okunup state'te tutuluyor
+    const [highScores, setHighScores] = useState<HighScores>(loadHighScores)
+    const [isNewRecord, setIsNewRecord] = useState(false)
 
     const isChecking = state.selectedCardIds.length === 2
     const isFinished =
@@ -62,6 +68,38 @@ function useMemoryGame(pairCount: number) {
         return () => window.clearTimeout(timer)
     }, [state.cards, state.selectedCardIds, state.isPaused])
 
+    // yeni tur başladığında yeni rekor bildirimini sıfırlar.
+    useEffect(() => {
+        setIsNewRecord(false)
+    }, [state.gameRound])
+
+    useEffect(() => {
+        //oyun bitmediyse rekor kontrolü yapılmaz
+        if (!isFinished) return
+
+        const currentBest = highScores[difficulty]
+        const isBetter =
+            !currentBest ||
+            state.elapsedTime < currentBest.elapsedTime ||
+            (state.elapsedTime === currentBest.elapsedTime &&
+                state.moves < currentBest.moves)
+
+        if (!isBetter) return
+
+        const updatedScores: HighScores = {
+            ...highScores,
+            [difficulty]: {
+                elapsedTime: state.elapsedTime,
+                moves: state.moves,
+                date: new Date().toISOString(),
+            },
+        }
+
+        setHighScores(updatedScores)
+        saveHighScore(updatedScores)
+        setIsNewRecord(true)
+    }, [isFinished])
+
     function handleCardClick(cardId: number) {
         dispatch({ type: 'SELECT_CARD', cardId })
     }
@@ -80,6 +118,9 @@ function useMemoryGame(pairCount: number) {
         elapsedTime: state.elapsedTime,
         isChecking,
         isFinished,
+        highScores,
+        bestScore: highScores[difficulty],
+        isNewRecord,
         togglePause: () => dispatch({ type: 'TOGGLE_PAUSE' }),
         handleCardClick,
         restartGame,

@@ -7,7 +7,7 @@ type GameResultModalProps = {
 
 function GameResultModal({onBackToHome}: GameResultModalProps) {
   // Oyun sonuç verilerini ve yeniden başlatma fonksiyonunu Context'ten alıyoruz
-  const {moves, elapsedTime, restartGame} = useGame();
+  const {moves, elapsedTime, bestScore, isNewRecord, restartGame} = useGame();
   return (
     <div className="result-overlay">
       <div className="result-panel">
@@ -15,6 +15,12 @@ function GameResultModal({onBackToHome}: GameResultModalProps) {
         <h2>Tebrikler🥳!</h2>
         <p>Süre: {formatTime(elapsedTime)}</p>
         <p>Hamle: {moves}</p>
+        {isNewRecord && <p className="new-record">🏆 Yeni rekor!</p>}
+        {bestScore && !isNewRecord && (
+          <p className="best-score">
+            En iyi: {formatTime(bestScore.elapsedTime)} · {bestScore.moves} hamle
+          </p>
+        )}
         <div className="result-actions">
           <button className="primary-button" type="button" onClick={restartGame}>
             Yeni oyun

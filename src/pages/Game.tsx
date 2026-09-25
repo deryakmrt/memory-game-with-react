@@ -24,10 +24,10 @@ function Game() {
     }
   }, [navigate, settings]);
 
-  if (!settings) return null;
+  if (!settings || !difficulty) return null;
 
   return (
-    <GameProvider pairCount={settings.pairCount}>
+    <GameProvider pairCount={settings.pairCount} difficulty={difficulty}>
       <GameContent settings={settings} />
     </GameProvider>
   );
